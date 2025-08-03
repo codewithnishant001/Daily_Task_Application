@@ -10,30 +10,23 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     ports:
-      - "3307:3306"  # Host:Container
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     restart: always
-    networks:
-      - dailytask-network
 
-  springboot-app:
+  app:
     build: .
     container_name: dailytask-springboot
-    depends_on:
-      - mysql
     ports:
       - "8081:8081"
+    depends_on:
+      - mysql
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dailytask_db
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-    networks:
-      - dailytask-network
+      - SPRING_DATASOURCE_URL=jdbc:mysql://dailytask-mysql:3306/dailytask_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+    restart: always
 
 volumes:
   mysql_data:
-
-networks:
-  dailytask-network:
