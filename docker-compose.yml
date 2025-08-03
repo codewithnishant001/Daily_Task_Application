@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: dailytask-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: dailytask_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3307:3306"  # Host:Container
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always
+    networks:
+      - dailytask-network
+
+  springboot-app:
+    build: .
+    container_name: dailytask-springboot
+    depends_on:
+      - mysql
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dailytask_db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - dailytask-network
+
+volumes:
+  mysql_data:
+
+networks:
+  dailytask-network:
